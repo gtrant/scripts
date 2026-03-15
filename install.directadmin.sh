@@ -378,15 +378,7 @@ cp -avf install.txt /etc/csf/
 cp -avf version.txt /etc/csf/
 cp -avf license.txt /etc/csf/
 cp -avf panels/webmin /usr/local/csf/lib/
-cp -avf ConfigServer /usr/local/csf/lib/
-cp -avf Net /usr/local/csf/lib/
-cp -avf Geo /usr/local/csf/lib/
-cp -avf Crypt /usr/local/csf/lib/
-cp -avf HTTP /usr/local/csf/lib/
-cp -avf JSON /usr/local/csf/lib/
-cp -avf version/* /usr/local/csf/lib/
-cp -avf csf.div /usr/local/csf/lib/
-cp -avf csfajaxtail.js /usr/local/csf/lib/
+cp -avf lib/* /usr/local/csf/lib/
 cp -avf conf/ui/images /etc/csf/ui/.
 cp -avf profiles /usr/local/csf/
 cp -avf conf/csf.directadmin.conf /usr/local/csf/profiles/reset_to_defaults.conf
