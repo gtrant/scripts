@@ -77,3 +77,6 @@ jobs:
           set -uo pipefail
           cd "$GITHUB_WORKSPACE"
           bash uninstall.sh
+
+  compatibility:
+    uses: ./.github/workflows/compatibility.yml

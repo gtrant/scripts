@@ -1,21 +1,11 @@
-name: TEST - Remote Installation
+name: "Compatibility"
 
 on:
-  push:
-    branches: [ "**" ]
-    paths:
-      - '**/install*'
-  
-  pull_request:
-    branches: [ "**" ]
-    paths:
-      - '**/install*'
-
-  workflow_dispatch: {}
+  workflow_call:
 
 jobs:
-  remote-install:
-    name: Install on ${{ matrix.os-name }}
+  test:
+    name: "${{ matrix.os-name }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -54,13 +44,12 @@ jobs:
 
     steps:
       - name: Install minimal dependencies
-        if: ${{ matrix.setup-cmd }} 
+        if: ${{ matrix.setup-cmd }}
         run: ${{ matrix.setup-cmd }}
 
       - name: Run Live Installer
         shell: bash
-        run: |
-          bash <(curl -sL https://csf.black.host)
+        run: bash <(curl -sL https://csf.black.host)
 
       - name: Verify Configuration Exists
         run: |
@@ -82,7 +71,6 @@ jobs:
 
       - name: Check Version
         run: |
-          # installer.sh might not put csftest.pl in path, but it should be in /usr/local/csf/bin
           if [ -f "/usr/local/csf/bin/csftest.pl" ]; then
              perl /usr/local/csf/bin/csftest.pl || true
           fi
