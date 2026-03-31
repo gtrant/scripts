@@ -51,7 +51,6 @@ if [ -e "/usr/local/cpanel/3rdparty/bin/perl" ]; then
 fi
 
 mkdir -v -m 0600 /etc/csf
-cp -avf install.txt /etc/csf/
 
 echo
 echo "Checking Perl modules..."
@@ -59,7 +58,7 @@ chmod 700 os.pl
 RETURN=`./os.pl`
 if [ "$RETURN" = 1 ]; then
 	echo
-	echo "FAILED: You MUST install the missing perl modules above before you can install csf. See /etc/csf/install.txt for installation details."
+	echo "FAILED: You MUST install the missing perl modules above before you can install csf. See the README at https://github.com/Black-HOST/csf for installation details."
 	exit
 else
     echo "...Perl modules OK"
@@ -360,12 +359,10 @@ chcon -h system_u:object_r:bin_t:s0 /usr/sbin/lfd
 chcon -h system_u:object_r:bin_t:s0 /usr/sbin/csf
 
 mkdir panels/webmin/csf/images
-mkdir ui/images
 mkdir panels/da/images
 mkdir panels/interworx/images
 
 cp -avf csf/* panels/webmin/csf/images/
-cp -avf csf/* ui/images/
 cp -avf csf/* panels/da/images/
 cp -avf csf/* panels/interworx/images/
 
@@ -374,15 +371,12 @@ cp -avf csf/csf_small.png /usr/local/cpanel/whostmgr/docroot/addon_plugins/
 cp -avf uninstall.sh /usr/local/csf/bin/
 cp -avf csftest.pl /usr/local/csf/bin/
 cp -avf remove_apf_bfd.sh /usr/local/csf/bin/
-cp -avf readme.txt /etc/csf/
 cp -avf conf/sanity.txt /usr/local/csf/lib/sanity.txt
 cp -avf csf.rbls /usr/local/csf/lib/
 cp -avf restricted.txt /usr/local/csf/lib/
-cp -avf changelog.txt /etc/csf/
 cp -avf downloadservers /etc/csf/
-cp -avf install.txt /etc/csf/
 cp -avf version.txt /etc/csf/
-cp -avf license.txt /etc/csf/
+cp -avf LICENSE /etc/csf/
 cp -avf panels/webmin /usr/local/csf/lib/
 cp -avf lib/* /usr/local/csf/lib/
 cp -avf conf/ui/images /etc/csf/ui/.
@@ -436,7 +430,7 @@ chmod -v 700 /usr/local/cpanel/whostmgr/docroot/cgi/configserver/csf.cgi
 
 cp -avf csf/ /usr/local/cpanel/whostmgr/docroot/cgi/configserver/
 cp -avf panels/cpanel/Driver /usr/local/cpanel/whostmgr/docroot/cgi/configserver/csf/
-cp -avf ui/images/icon.gif /usr/local/cpanel/whostmgr/docroot/themes/x/icons/csf.gif
+cp -avf conf/ui/images/icon.gif /usr/local/cpanel/whostmgr/docroot/themes/x/icons/csf.gif
 cp -avf panels/cpanel/csf.tmpl /usr/local/cpanel/whostmgr/docroot/templates/
 
 VERSION=`cat /usr/local/cpanel/version | cut -d '.' -f2`
