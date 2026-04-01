@@ -397,8 +397,8 @@ cp -avf apf_stub.pl /etc/csf/
 rm -fv /etc/csf/csf.spamhaus /etc/csf/csf.dshield /etc/csf/csf.tor /etc/csf/csf.bogon
 
 mkdir -p /usr/local/man/man1/
-cp -avf csf.1.txt /usr/local/man/man1/csf.1
-cp -avf csf.help /usr/local/csf/lib/
+cp -avf lib/csf.1.txt /usr/local/man/man1/csf.1
+man /usr/local/man/man1/csf.1 | col -b > /usr/local/csf/lib/csf.help
 chmod 755 /usr/local/man/
 chmod 755 /usr/local/man/man1/
 chmod 644 /usr/local/man/man1/csf.1
