@@ -39,7 +39,7 @@ fi
 
 #First replace:
 if [ -e "/usr/local/cpanel/3rdparty/bin/perl" ]; then
-    sed -i 's%^#\!/usr/bin/perl%#\!/usr/local/cpanel/3rdparty/bin/perl%' auto.pl
+    sed -i 's%^#\!/usr/bin/perl%#\!/usr/local/cpanel/3rdparty/bin/perl%' auto.cpanel.pl
     sed -i 's%^#\!/usr/bin/perl%#\!/usr/local/cpanel/3rdparty/bin/perl%' panels/cpanel/csf.cgi
     sed -i 's%^#\!/usr/bin/perl%#\!/usr/local/cpanel/3rdparty/bin/perl%' csf.pl
     sed -i 's%^#\!/usr/bin/perl%#\!/usr/local/cpanel/3rdparty/bin/perl%' csftest.pl
@@ -414,8 +414,8 @@ cp -avf csget.pl /etc/cron.daily/csget
 chmod 700 /etc/cron.daily/csget
 /etc/cron.daily/csget --nosleep
 
-chmod -v 700 auto.pl
-./auto.pl $OLDVERSION
+chmod -v 700 auto.cpanel.pl
+./auto.cpanel.pl $OLDVERSION
 
 mkdir /usr/local/cpanel/whostmgr/docroot/cgi/configserver
 chmod 700 /usr/local/cpanel/whostmgr/docroot/cgi/configserver
@@ -543,7 +543,7 @@ fi
 
 #Second replace
 if [ -e "/usr/local/cpanel/3rdparty/bin/perl" ]; then
-    sed -i 's%^#\!/usr/local/cpanel/3rdparty/bin/perl%#\!/usr/bin/perl%' auto.pl
+    sed -i 's%^#\!/usr/local/cpanel/3rdparty/bin/perl%#\!/usr/bin/perl%' auto.cpanel.pl
     sed -i 's%^#\!/usr/local/cpanel/3rdparty/bin/perl%#\!/usr/bin/perl%' panels/cpanel/csf.cgi
     sed -i 's%^#\!/usr/local/cpanel/3rdparty/bin/perl%#\!/usr/bin/perl%' csf.pl
     sed -i 's%^#\!/usr/local/cpanel/3rdparty/bin/perl%#\!/usr/bin/perl%' csftest.pl
