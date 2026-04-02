@@ -421,8 +421,8 @@ cp -avf csget.pl /etc/cron.daily/csget
 chmod 700 /etc/cron.daily/csget
 /etc/cron.daily/csget --nosleep
 
-chmod -v 700 auto.vesta.pl
-./auto.vesta.pl $OLDVERSION
+chmod -v 700 auto.pl
+./auto.pl $OLDVERSION vesta
 
 if test `cat /proc/1/comm` = "systemd"
 then

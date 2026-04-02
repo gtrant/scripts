@@ -80,6 +80,45 @@ foreach my $alertfile ("sshalert.txt","sualert.txt","sudoalert.txt","webminalert
 	}
 }
 
+# Panel-specific pre-setup hooks
+if ($panel eq "cwp") {
+	if (-e "/usr/local/cwpsrv") {
+		sysopen (my $CWP, "/usr/local/cwpsrv/htdocs/resources/admin/include/3rdparty.php", O_RDWR | O_CREAT);
+		flock ($CWP, LOCK_EX);
+		my @data = <$CWP>;
+		chomp @data;
+		if (!(grep {$_ =~ /configserver/} @data)) {
+
+			seek ($CWP, 0, 0);
+			truncate ($CWP, 0);
+			foreach my $line (@data) {
+				print $CWP $line."\n";
+			}
+			print $CWP "<?php include('/usr/local/cwpsrv/htdocs/resources/admin/include/configserver.php'); ?>\n";
+		}
+		close ($CWP);
+	}
+}
+if ($panel eq "vesta") {
+	if (-e "/usr/local/vesta") {
+		sysopen (my $VESTA, "/usr/local/vesta/web/templates/admin/panel.html", O_RDWR | O_CREAT);
+		flock ($VESTA, LOCK_EX);
+		my @data = <$VESTA>;
+		chomp @data;
+		seek ($VESTA, 0, 0);
+		truncate ($VESTA, 0);
+		foreach my $line (@data) {
+			if (!(grep {$_ =~ /CSF/} @data) and $line =~ /if\(\$TAB == 'SERVER'/) {
+				print $VESTA $line."\n";
+				print $VESTA "<div class=\"l-menu__item <?php if(\$TAB == 'CSF' ) echo 'l-menu__item--active' ?>\"><a href=\"/list/csf/\"><?=__('CSF')?></a></div>\n";
+			} else {
+				print $VESTA $line."\n";
+			}
+		}
+		close ($VESTA);
+	}
+}
+
 if (&checkversion("10.11") and !-e "/var/lib/csf/auto1011") {
 	if (-e "/var/lib/csf/stats/lfdstats") {
 		sysopen (STATS,"/var/lib/csf/stats/lfdstats", O_RDWR | O_CREAT);
@@ -174,10 +213,12 @@ if (&checkversion("14.03") and !-e "/var/lib/csf/auto1403") {
 		close (IN);
 	}
 
-	open (OUT, ">", "/var/lib/csf/auto1403");
-	flock (OUT, LOCK_EX);
-	print OUT time;
-	close (OUT);
+	if ($panel ne "directadmin") {
+		open (OUT, ">", "/var/lib/csf/auto1403");
+		flock (OUT, LOCK_EX);
+		print OUT time;
+		close (OUT);
+	}
 }
 
 if (-e "/etc/csf/csf.allow") {
@@ -261,6 +302,22 @@ if (-e "/var/lib/csf/csf.tempallow") {
 	close (IN);
 }
 
+# Panel-specific service monitoring
+if ($panel eq "directadmin") {
+	open (IN,"<", "/usr/local/directadmin/data/admin/services.status");
+	flock (IN, LOCK_SH);
+	my @chkservd = <IN>;
+	close (IN);
+	chomp @chkservd;
+
+	if (not grep {$_ =~ /^lfd/} @chkservd) {
+		open (OUT, ">>", "/usr/local/directadmin/data/admin/services.status");
+		flock (OUT, LOCK_EX);
+		print OUT "lfd=ON\n";
+		close OUT;
+	}
+}
+
 if ($config{TESTING}) {
 
 	open (IN, "<", "/etc/ssh/sshd_config") or die $!;
@@ -310,7 +367,7 @@ if ($config{TESTING}) {
 	}
 
 	open (FH, "<", "/proc/sys/kernel/osrelease");
-	flock (IN, LOCK_SH);
+	flock (FH, LOCK_SH);
 	my @data = <FH>;
 	close (FH);
 	chomp @data;
@@ -385,7 +442,7 @@ if ($config{TESTING}) {
 		if (grep {$_ =~ /\s*inet6/} @ifconfig) {
 			$config{IPV6} = 1;
 			open (FH, "<", "/proc/sys/kernel/osrelease");
-			flock (IN, LOCK_SH);
+			flock (FH, LOCK_SH);
 			my @data = <FH>;
 			close (FH);
 			chomp @data;
@@ -424,6 +481,23 @@ if ($config{TESTING}) {
 	}
 }
 
+# DirectAdmin: Roundcube version check for log path adjustment
+my $roundcube;
+if ($panel eq "directadmin" and &checkversion("14.03") and !-e "/var/lib/csf/auto1403") {
+	$roundcube = 1.4;
+	open (my $RC, "<", "/var/www/html/roundcube/program/include/iniset.php");
+	flock ($RC, LOCK_SH);
+	foreach my $line (<$RC>) {
+		chomp $line;
+		if ($line =~ /define\s*\(\s*'RCMAIL_VERSION'\s*,\s*'([^']*)'/) {
+			$roundcube = $1;
+			last;
+		}
+	}
+	close ($RC);
+	if ($roundcube < 1.4) {$roundcube = 0} else {$roundcube = 1}
+}
+
 open (IN, "<", "conf/$panel/csf.conf") or die $!;
 flock (IN, LOCK_SH) or die $!;
 my @config = <IN>;
@@ -455,6 +529,10 @@ foreach my $line (@config) {
 		print $AUTO time;
 		close ($AUTO);
 	}
+	# DirectAdmin: adjust Roundcube log path if needed
+	if ($panel eq "directadmin" and &checkversion("14.03") and !-e "/var/lib/csf/auto1403" and $name eq "DIRECTADMIN_LOG_R") {
+		if ($roundcube and $config{$name} !~ /\.log$/) {$config{$name} = "/var/www/html/roundcube/logs/errors.log"}
+	}
 	if ($configsetting{$name}) {
 		print OUT "$name = \"$config{$name}\"\n";
 	} else {
@@ -471,6 +549,14 @@ foreach my $line (@config) {
 	}
 }
 close OUT;
+
+# DirectAdmin: deferred auto1403 sentinel (after config merge applies Roundcube path)
+if ($panel eq "directadmin" and &checkversion("14.03") and !-e "/var/lib/csf/auto1403") {
+	open (my $AUTO, ">", "/var/lib/csf/auto1403");
+	flock ($AUTO, LOCK_EX);
+	print $AUTO time;
+	close ($AUTO);
+}
 
 if ($config{TESTING}) {
 	my @netstat = `netstat -lpn`;

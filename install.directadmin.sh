@@ -403,8 +403,8 @@ cp -avf csget.pl /etc/cron.daily/csget
 chmod 700 /etc/cron.daily/csget
 /etc/cron.daily/csget --nosleep
 
-chmod -v 700 auto.directadmin.pl
-./auto.directadmin.pl $OLDVERSION
+chmod -v 700 auto.pl
+./auto.pl $OLDVERSION directadmin
 
 mkdir -p /usr/local/directadmin/plugins/csf/
 chmod 711 /usr/local/directadmin/plugins/csf

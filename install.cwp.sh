@@ -441,8 +441,8 @@ cp -avf csget.pl /etc/cron.daily/csget
 chmod 700 /etc/cron.daily/csget
 /etc/cron.daily/csget --nosleep
 
-chmod -v 700 auto.cwp.pl
-./auto.cwp.pl $OLDVERSION
+chmod -v 700 auto.pl
+./auto.pl $OLDVERSION cwp
 
 if test `cat /proc/1/comm` = "systemd"
 then
