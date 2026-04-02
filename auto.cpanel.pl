@@ -57,8 +57,8 @@ if (-e "/proc/vz/veinfo") {
 }
 
 if ($config{GENERIC}) {
-	exec "./auto.generic.pl";
-	exit;
+	exec "./auto.pl", $oldversion, "generic";
+	die "Error: unable to exec ./auto.pl generic: $!\n";
 }
 
 foreach my $alertfile ("sshalert.txt","sualert.txt","sudoalert.txt","webminalert.txt","cpanelalert.txt") {
